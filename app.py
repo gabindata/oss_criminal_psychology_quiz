@@ -40,6 +40,12 @@ def load_users():
     with open(APP_DIR / "users.json", "r", encoding="utf-8") as f:
         return json.load(f)
 
+def get_users():
+    override = st.session_state.get("_users_override")
+    if isinstance(override, dict):
+        return override
+    return load_users()
+
 # ──────────────────────────────────────────
 # 페이지 설정
 # ──────────────────────────────────────────
@@ -65,6 +71,7 @@ def init_state():
         "show_explanation": False,
         "selected_choice": None,
         "has_scored_current": False,
+        "_users_override": None,
     }
     for k, v in defaults.items():
         if k not in st.session_state:
@@ -90,16 +97,19 @@ def show_login():
             with c2:
                 submitted = st.form_submit_button("로그인", use_container_width=True)
 
+        msg = st.empty()
         if submitted:
-            users = load_users()
+            msg.empty()
+            users = get_users()
             if username in users and users[username] == password:
                 st.session_state.logged_in = True
                 st.session_state.username = username
-                st.success(f"환영합니다, {username}님!")
+                st.session_state._users_override = None
+                msg.success(f"환영합니다, {username}님!")
                 time.sleep(0.8)
                 st.rerun()
             else:
-                st.error("아이디 또는 비밀번호가 올바르지 않습니다.") 
+                msg.error("아이디 또는 비밀번호가 올바르지 않습니다.") 
                 
     with tab_signup:
         st.markdown("##### 새 계정을 만들고 퀴즈를 시작하세요.")
@@ -136,7 +146,9 @@ def show_login():
                 st.error(f"회원가입 정보 저장 중 오류가 발생했습니다: {e}")
                 return
 
-            # 캐시 갱신 
+            # 회원가입 직후 로그인 1회는 파일 재읽기 없이 진행
+            st.session_state._users_override = users
+            # 저장된 내용이 이후 로그인에도 반영되도록 캐시 갱신
             load_users.clear()
             st.success("회원가입이 완료되었습니다! 이제 로그인 탭에서 로그인해주세요.")
 
