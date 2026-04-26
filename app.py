@@ -1,5 +1,4 @@
 import streamlit as st
-import streamlit.components.v1 as components
 import json
 import time
 from pathlib import Path
@@ -70,19 +69,6 @@ def init_state():
             st.session_state[k] = v
 
 init_state()
-
-# ──────────────────────────────────────────
-# 유틸: 화면 최상단으로 스크롤
-# ──────────────────────────────────────────
-def scroll_to_top():
-    components.html(
-        """
-        <script>
-          window.parent?.scrollTo(0, 0);
-        </script>
-        """,
-        height=0,
-    )
 
 # ══════════════════════════════════════════
 # 로그인 화면
@@ -275,7 +261,6 @@ def show_quiz():
 # 결과 화면
 # ══════════════════════════════════════════
 def show_result():
-    scroll_to_top()
     quiz_data = load_quiz_data()
     total_points = sum(int(q.get("points", 1)) for q in quiz_data)
     score = st.session_state.score
