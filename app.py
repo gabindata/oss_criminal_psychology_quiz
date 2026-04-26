@@ -30,7 +30,7 @@ def render_sidebar(quiz_data):
 # ──────────────────────────────────────────
 @st.cache_data
 def load_quiz_data():
-    print("📂 quiz_data.json 파일에서 실제로 읽어옴!")
+    print("📂 quiz_data.json 파일에서 읽어옴!")
     with open(APP_DIR / "quiz_data.json", "r", encoding="utf-8") as f:
         return json.load(f)
 
